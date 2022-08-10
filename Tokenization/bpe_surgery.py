@@ -7,6 +7,7 @@ from farasa.segmenter import FarasaSegmenter
 import pickle 
 from tqdm.notebook import tqdm
 from const import SOW, UNK, PAD, MORPH_SEP
+import os 
 
 class bpe:
   """
@@ -38,7 +39,7 @@ class bpe:
     self.name += f'-{lang}'
     self.name += f'-{vocab_size}'
     self.lower_case = lower_case
-    nltk.download('punkt') 
+    nltk.download('punkt', quiet=True) 
 
   def split_affixes(self, affixes):
     """
@@ -281,7 +282,7 @@ class bpe:
 
   
     if CONTINUE_PRETRAINED:
-      print("Continue pretraining from vocab_size : ", len(self.vocab_size))
+      print("Continue pretraining from vocab_size : ", len(self.vocab))
       self.corpus = self.apply_merges(self.corpus, self.merges)
     else:
       self.vocab += [char for char in set(t.replace(' ', ''))]
@@ -470,9 +471,12 @@ class bpe:
     save merges using file name
     returns: [None] 
     """
-    with open(f'{path}/{self.name}.model', 'wb') as handle:
+    os.makedirs(path, exist_ok=True)
+    os.makedirs(f'{path}/{self.name}', exist_ok=True)
+
+    with open(f'{path}/{self.name}/tok.model', 'wb') as handle:
       pickle.dump([self.vocab, self.merges], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
   def load(self, path):
-    with open(f'{path}/{self.name}.model', 'rb') as handle:
+    with open(f'{path}/tok.model', 'rb') as handle:
       self.vocab, self.merges = pickle.load(handle)

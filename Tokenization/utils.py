@@ -1,6 +1,5 @@
 from io import open
 from conllu import parse_incr
-import re 
 import glob 
 
 def preprocess(text):
@@ -29,9 +28,9 @@ def parse_file(file, out):
             pass
     return out
 
-def get_gold_segmentations(dataset = "cameltb"):
-    if dataset == "cameltb":
-        conll_files = glob.glob('camelTB/data/annotated/**/**.conllx')
+def get_gold_segmentations(dataset = "camelTB"):
+    if "camelTB" in dataset:
+        conll_files = glob.glob(f'{dataset}/data/annotated/**/**.conllx')
         out = {}
         for file in conll_files:
             out = parse_file(file, out)
