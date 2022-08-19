@@ -14,7 +14,7 @@ class bpe:
   Tokenizer main class
   """
   def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = False, prob = 0,
-               lang = 'en', lower_case = True, prefixes = [], suffixes = []):
+               lang = 'ar', lower_case = True, prefixes = [], suffixes = []):
     self.vocab = [PAD, UNK, SOW]  
     self.morph = morph
     self.prob = prob
