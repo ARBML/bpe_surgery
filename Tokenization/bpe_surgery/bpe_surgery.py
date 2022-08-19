@@ -420,6 +420,26 @@ class bpe:
     pbar.close()
     
     return output
+  
+  def encode_sentences(self, data = None, out_len = None):
+    """
+    encode a text corpus from raw data our from a file
+    returns: [list of int]
+    """
+    sentences = data.copy()
+
+    output = []
+    if self.seg:
+      sentences = self.segmenter.segment(sentences)
+
+    pbar = tqdm(total=len(sentences)) 
+    for stmt in sentences:
+      output.append(self._encode_sentence(stmt, out_len = out_len))
+      pbar.update(1)
+    pbar.close()
+    
+    return output
+
   def decode(self, ids):
     """
     Decode a list of ids
