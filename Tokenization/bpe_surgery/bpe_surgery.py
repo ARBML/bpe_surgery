@@ -512,9 +512,8 @@ class bpe:
     returns: [None] 
     """
     os.makedirs(path, exist_ok=True)
-    os.makedirs(f'{path}/{self.name}', exist_ok=True)
 
-    with open(f'{path}/{self.name}/tok.model', 'wb') as handle:
+    with open(f'{path}/tok.model', 'wb') as handle:
       pickle.dump([self.vocab, self.merges], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
   def load(self, path):
