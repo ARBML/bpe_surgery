@@ -49,9 +49,9 @@ assert len(train_text) == len(train_lbls)
 assert len(test_text) == len(test_text)
 
 def tokenize_data(tokenizer, vocab_size = 10000):
-  train_data = tokenizer.encode(train_text, out_len=MAX_TOKENS)
-  valid_data = tokenizer.encode(valid_text, out_len=MAX_TOKENS)
-  test_data = tokenizer.encode(test_text, out_len=MAX_TOKENS)
+  train_data = tokenizer.encode(train_text, out_length=MAX_TOKENS)
+  valid_data = tokenizer.encode(valid_text, out_length=MAX_TOKENS)
+  test_data = tokenizer.encode(test_text, out_length=MAX_TOKENS)
   return (train_data, train_lbls), (valid_data, valid_lbls), (test_data, test_lbls)
 
 def create_dataset(train_data, valid_data, test_data, batch_size = 256, buffer_size = 50000):
