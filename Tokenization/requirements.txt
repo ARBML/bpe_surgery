@@ -1,3 +1,4 @@
 farasapy
 tqdm
 nltk
+Morfessor
