@@ -180,7 +180,7 @@ def evaluate_test(test_dataset):
 
 results = {}
 
-BATCH_SIZE = 256
+BATCH_SIZE = 64
 vocab_size = int(args.vocab_size)
 
 
@@ -198,8 +198,9 @@ tokenizer = tokenizers[i]
 name = tokenizer.name
 
 #updated to add the vocab size as a directory
-ckpt_dir = "ckpts"
-accs_path = f"{ckpt_dir}/{name}/accuracies.json"
+os.makedirs(f"ckpts/{name}/{dataset}", exist_ok = True)
+ckpt_dir = f"ckpts/{name}/{dataset}"
+accs_path = f"{ckpt_dir}/accuracies.json"
 
 if os.path.isfile(accs_path):
   accs = defaultdict(
@@ -216,22 +217,21 @@ else:
 if j != len(accs[name]):
   print('This run already finished')
 else:
-    tok_dir = f"{ckpt_dir}/{name}"
-    if os.path.isfile(f"{tok_dir}/tok.model"):
+    if os.path.isfile(f"ckpts/{name}/tok.model"):
         print('loading pretrained tokenizer')
-        tokenizer.load(f"{tok_dir}")
+        tokenizer.load(f"ckpts/{name}/")
         print('load tokenized data')
-        if os.path.isfile(f'{ckpt_dir}/{name}/tok.data'):
-            with open(f'{ckpt_dir}/{name}/tok.data', 'rb') as handle:
+        if os.path.isfile(f'{ckpt_dir}/tok.data'):
+            with open(f'{ckpt_dir}/tok.data', 'rb') as handle:
                 train_data, valid_data, test_data = pickle.load(handle)
     else:
         print('training tokenizer from scratch')
-        tokenizer.train(file = 'datasets/ajgt/train_data.txt')
+        tokenizer.train(file = f'{dataset_path}/train_data.txt')
 
-    if not os.path.isfile(f'{ckpt_dir}/{name}/tok.data'):
+    if not os.path.isfile(f'{ckpt_dir}/tok.data'):
         train_data, valid_data, test_data = tokenize_data(tokenizer, vocab_size = vocab_size)
     
-    with open(f'{ckpt_dir}/{name}/tok.data', 'wb') as handle:
+    with open(f'{ckpt_dir}/tok.data', 'wb') as handle:
       pickle.dump([train_data, valid_data, test_data], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
     train_dataset, valid_dataset, test_dataset = create_dataset(train_data, valid_data, test_data, batch_size = BATCH_SIZE)
@@ -247,15 +247,15 @@ else:
     )
     ckpt_manager = tf.train.CheckpointManager(
         checkpoint,
-        f'{ckpt_dir}/{name}/run_{j}',
+        f'{ckpt_dir}/run_{j}',
         max_to_keep=1,
         checkpoint_name='ckpt',
     )
 
     print(f'run: {j}')
     train(epochs = 20)
-    if not os.path.isfile(f"{tok_dir}/tok.model"):
-        tokenizer.save(f"{tok_dir}")
+    if not os.path.isfile(f"ckpts/{name}/tok.model"):
+        tokenizer.save(f"ckpts/{name}/")
     # restore best model
     checkpoint.restore(ckpt_manager.latest_checkpoint)
     _, test_score = evaluate_test(test_dataset)

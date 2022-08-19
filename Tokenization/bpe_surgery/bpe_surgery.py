@@ -6,18 +6,19 @@ import random
 from farasa.segmenter import FarasaSegmenter
 import pickle 
 from tqdm.notebook import tqdm
-from const import SOW, UNK, PAD, MORPH_SEP
+from const import SOW, UNK, PAD, MORPH_SEP, SEG_SEP
 import os 
 
 class bpe:
   """
   Tokenizer main class
   """
-  def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, prob = 0,
+  def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = True, prob = 0,
                lang = 'en', lower_case = True, prefixes = [], suffixes = []):
     self.vocab = [PAD, UNK, SOW]  
     self.morph = morph
     self.prob = prob
+    self.seg = seg
     self.morph_with_sep = morph_with_sep     
     self.merges = []
     self.vocab_size = vocab_size
@@ -35,6 +36,10 @@ class bpe:
         self.segmenter = io.read_binary_model_file('morfessor.bin')
       elif lang == 'ar':
         self.segmenter = FarasaSegmenter()
+
+    if self.seg:
+      self.name += '-seg'
+      self.segmenter = FarasaSegmenter()
 
     self.name += f'-{lang}'
     self.name += f'-{vocab_size}'
@@ -228,7 +233,7 @@ class bpe:
     # note that sentecepiece doesnt' seem to split on continued characters like he,then which is annoying.
     t = re.sub('-', '', t)
     t = re.sub('\'', '', t)
-    t = re.sub(' +', ' ', t)
+    # t = re.sub(' +', ' ', t)
 
     if self.lower_case:
       t = t.lower()
@@ -275,6 +280,11 @@ class bpe:
     CONTINUE_PRETRAINED = len(self.merges) != 0
 
     t = self.preprocess(t)
+
+    if self.seg:
+      print("apply pre segmentation ...")
+      t = self.segmenter.segment(t)
+
     self.corpus = Counter()
     for word in t.split(' '):
       if len(word) > 0:
@@ -370,6 +380,7 @@ class bpe:
     returns: [list of int]
     """
     output = []
+
     for word in sentence.split(' '):
       if len(word) > 0:
         output.append(self._encode_word(word))
@@ -399,6 +410,9 @@ class bpe:
       raise('Error, not correct input')
 
     output = []
+    if self.seg:
+      sentences = self.segmenter.segment(sentences)
+
     pbar = tqdm(total=len(sentences)) 
     for stmt in sentences:
       output.append(self._encode_sentence(stmt, out_len = out_len))
@@ -425,8 +439,14 @@ class bpe:
     returns: [tokens]
     """
     tokens = []
-    pbar = tqdm(total=len(sentence.split(' ')))
-    for word in sentence.split(' '):
+
+    if self.seg:
+      sentence = self.segmenter.segment(sentence)
+      
+    words = sentence.split(' ')
+    pbar = tqdm(total=len(words))
+    
+    for word in words:
       if len(word) > 0:
         tokens.append(self._tokenize_word(word, remove_sow = remove_sow))
       pbar.update(1)
