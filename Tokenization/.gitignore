@@ -1,5 +1,0 @@
-*.pyc
-*.Identifier
-datasets/*
-build/*
-bpe_suergery.egg-info/*

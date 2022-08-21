@@ -4,3 +4,9 @@ Tokenization/datasets/*
 Tokenization/ckpts
 Tokenization/.ipynb_checkpoints/
 Tokenization/ckpts/*
+Tokenization/bpe_surgery.egg-info/dependency_links.txt
+Tokenization/bpe_surgery.egg-info/not-zip-safe
+Tokenization/bpe_surgery.egg-info/PKG-INFO
+Tokenization/bpe_surgery.egg-info/requires.txt
+Tokenization/bpe_surgery.egg-info/SOURCES.txt
+Tokenization/bpe_surgery.egg-info/top_level.txt
