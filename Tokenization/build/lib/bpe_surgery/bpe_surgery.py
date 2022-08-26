@@ -6,7 +6,7 @@ import random
 from farasa.segmenter import FarasaSegmenter
 import pickle 
 from tqdm.notebook import tqdm
-from .const import SOW, UNK, PAD, MORPH_SEP, SEG_SEP
+from .const import SOW, UNK, PAD, MORPH_SEP, SEG_SEP, SOS, EOS
 import os 
 
 class bpe:
@@ -15,7 +15,9 @@ class bpe:
   """
   def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = False, prob = 0,
                lang = 'ar', lower_case = True, prefixes = [], suffixes = []):
-    self.vocab = [PAD, UNK, SOW]  
+    self.vocab = [PAD, UNK, SOW, SOS, EOS]
+    self.sos = SOS
+    self.eos = EOS  
     self.morph = morph
     self.prob = prob
     self.seg = seg
@@ -226,12 +228,11 @@ class bpe:
     t = t.replace("\n", "")
 
     # sp doesn't split on characters like lock-up =/> lock up 
-    t = re.sub('([.,?;!])', ' ', t)
+    t = re.sub('([.,?;!-])', ' ', t)
 
     # not clear how to deal with such special characters like made-up, it seems in sentencepiece it removes the - but 
     # it doesn't to be the same for for \'
     # note that sentecepiece doesnt' seem to split on continued characters like he,then which is annoying.
-    t = re.sub('-', '', t)
     t = re.sub('\'', '', t)
     # t = re.sub(' +', ' ', t)
 
@@ -374,7 +375,7 @@ class bpe:
     tokens = self._tokenize_word(word, remove_sow=False)
     return [self.vocab.index(token) for token in tokens]
 
-  def _encode_sentence(self, sentence, out_length = None):
+  def _encode_sentence(self, sentence, add_boundry = False, out_length = None):
     """
     encode a senteces
     returns: [list of int]
@@ -386,15 +387,17 @@ class bpe:
         output.append(self._encode_word(word))
 
     output = [item for sublist in output for item in sublist]
-
     
+    if add_boundry:
+      output = [3]+output+[4]
+
     if out_length is None:
       return output
     else:
       if out_length > len(output):
         return output + [self.vocab.index(PAD)] * max(out_length - len(output), 0)
       else:
-        return output[:out_length]
+        return output[:out_length-1]+[4]
 
   def encode(self, data = None, from_path = None, out_length = None):
     """
@@ -421,7 +424,7 @@ class bpe:
     
     return output
   
-  def encode_sentences(self, data = None, out_length = None):
+  def encode_sentences(self, data = None, add_boundry = False, out_length = None):
     """
     encode a text corpus from raw data our from a file
     returns: [list of int]
@@ -434,7 +437,7 @@ class bpe:
 
     pbar = tqdm(total=len(sentences)) 
     for stmt in sentences:
-      output.append(self._encode_sentence(stmt, out_length = out_length))
+      output.append(self._encode_sentence(stmt, add_boundry = add_boundry, out_length = out_length))
       pbar.update(1)
     pbar.close()
     
