@@ -15,7 +15,9 @@ class bpe:
   """
   def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = False, prob = 0,
                lang = 'ar', lower_case = True, prefixes = [], suffixes = []):
+    self.special_tokens = [PAD, UNK, SOW, SOS, EOS]
     self.vocab = [PAD, UNK, SOW, SOS, EOS]
+    self.sow = SOW
     self.sos = SOS
     self.eos = EOS  
     self.morph = morph
@@ -455,6 +457,28 @@ class bpe:
       return output
     else:
       return [self.vocab[id] for id in ids]
+  
+  def decode_sentences(self, ids):
+    """
+    list of lists of ids
+    returns: [tokens] _he ll _hi there _k
+    """
+    output = []
+    for inst in ids:
+        stmt = ''
+        stmt = ''
+        for _id in inst:
+            token = self.vocab[_id]
+            if token.startswith(self.sow):
+                stmt = stmt + " "
+            if token in self.special_tokens:
+                continue
+            stmt += token.replace(self.sow, '')
+        
+
+    output.append(stmt.strip())
+      
+    return output 
 
   def tokenize(self, sentence, remove_sow = True):
     """
