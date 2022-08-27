@@ -19,7 +19,16 @@ class bpe:
     self.vocab = [PAD, UNK, SOW, SOS, EOS]
     self.sow = SOW
     self.sos = SOS
-    self.eos = EOS  
+    self.eos = EOS
+    self.pad = PAD
+    self.unk = UNK
+    
+    self.pad_idx = 0
+    self.unk_idx = 1
+    self.sow_idx = 2
+    self.sos_idx = 3
+    self.eos_idx = 4
+
     self.morph = morph
     self.prob = prob
     self.seg = seg
