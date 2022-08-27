@@ -466,7 +466,6 @@ class bpe:
     output = []
     for inst in ids:
         stmt = ''
-        stmt = ''
         for _id in inst:
             token = self.vocab[_id]
             if token.startswith(self.sow):
