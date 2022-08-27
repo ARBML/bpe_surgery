@@ -476,7 +476,7 @@ class bpe:
             stmt += token.replace(self.sow, '')
         
 
-    output.append(stmt.strip())
+        output.append(stmt.strip())
       
     return output 
 
