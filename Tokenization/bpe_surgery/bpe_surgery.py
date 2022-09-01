@@ -444,7 +444,7 @@ class bpe:
 
     output = []
     if self.seg:
-      sentences = self.segmenter.segment(sentences)
+      sentences = [self.segmenter.segment(sent) for sent in sentences]
 
     pbar = tqdm(total=len(sentences)) 
     for stmt in sentences:
