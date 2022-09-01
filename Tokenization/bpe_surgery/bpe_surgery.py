@@ -444,7 +444,9 @@ class bpe:
 
     output = []
     if self.seg:
-      sentences = [self.segmenter.segment(sent) for sent in sentences]
+      joined_sentences = ' <sep> '.join(sentences)
+      seg_joined_setnences = self.segmenter.segment(joined_sentences)
+      sentences = [sentence.strip() for sentence in seg_joined_setnences.split('<sep>')]
 
     pbar = tqdm(total=len(sentences)) 
     for stmt in sentences:
