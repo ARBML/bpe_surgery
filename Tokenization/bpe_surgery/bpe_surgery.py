@@ -545,16 +545,16 @@ class bpe:
     return sum([len(tokens) for tokens in self.encode(data= data, from_path = from_path, out_length = None)])
      
 
-  def save(self, path):
+  def save(self, path, name = 'tok'):
     """
     save merges using file name
     returns: [None] 
     """
     os.makedirs(path, exist_ok=True)
 
-    with open(f'{path}/tok.model', 'wb') as handle:
+    with open(f'{path}/{name}.model', 'wb') as handle:
       pickle.dump([self.vocab, self.merges], handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-  def load(self, path):
-    with open(f'{path}/tok.model', 'rb') as handle:
+  def load(self, path, name = 'tok'):
+    with open(f'{path}/{name}.model', 'rb') as handle:
       self.vocab, self.merges = pickle.load(handle)
