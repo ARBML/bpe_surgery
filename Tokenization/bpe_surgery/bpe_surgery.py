@@ -378,12 +378,12 @@ class bpe:
       step += 1
     pbar.close()
 
-  def _encode_word(self, word):
+  def _encode_word(self, word, remove_sow = False):
     """
     encode a single word
     returns: ids
     """
-    tokens = self._tokenize_word(word, remove_sow=False)
+    tokens = self._tokenize_word(word, remove_sow=remove_sow)
     return [self.vocab.index(token) for token in tokens]
 
   def _encode_sentence(self, sentence, add_boundry = False, out_length = None):
