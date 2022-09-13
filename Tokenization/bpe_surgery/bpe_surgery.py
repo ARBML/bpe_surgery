@@ -250,7 +250,11 @@ class bpe:
     if self.lower_case:
       t = t.lower()
 
+<<<<<<< HEAD
     return t.strip()
+=======
+    return t.trim()
+>>>>>>> beda7a578827fcaa7b92243be60aa490b7406c36
   
   def apply_merges(self, corpus, merges):
     """Given a set of merges it applies the merges on the corpus
