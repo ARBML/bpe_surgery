@@ -239,18 +239,18 @@ class bpe:
     t = t.replace("\n", "")
 
     # sp doesn't split on characters like lock-up =/> lock up 
-    t = re.sub('([.,?;!-])', ' ', t)
+    t = re.sub('(?<=\w)([.,?;!-])', r' \1', t)
 
     # not clear how to deal with such special characters like made-up, it seems in sentencepiece it removes the - but 
     # it doesn't to be the same for for \'
     # note that sentecepiece doesnt' seem to split on continued characters like he,then which is annoying.
-    t = re.sub('\'', '', t)
-    # t = re.sub(' +', ' ', t)
+    # t = re.sub('\'', '', t)
+    t = re.sub(' +', ' ', t)
 
     if self.lower_case:
       t = t.lower()
 
-    return t
+    return t.strip()
   
   def apply_merges(self, corpus, merges):
     """Given a set of merges it applies the merges on the corpus
