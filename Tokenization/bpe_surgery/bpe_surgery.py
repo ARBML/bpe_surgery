@@ -14,7 +14,7 @@ class bpe:
   Tokenizer main class
   """
   def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = False, prob = 0,
-               lang = 'ar', lower_case = True, prefixes = [], suffixes = []):
+               lang = 'ar', do_preprocess = True, lower_case = True, prefixes = [], suffixes = []):
     self.special_tokens = [PAD, UNK, SOW, SOS, EOS]
     self.vocab = [PAD, UNK, SOW, SOS, EOS]
     self.sow = SOW
@@ -32,7 +32,8 @@ class bpe:
     self.morph = morph
     self.prob = prob
     self.seg = seg
-    self.morph_with_sep = morph_with_sep     
+    self.morph_with_sep = morph_with_sep
+    self.do_preprocess = do_preprocess     
     self.merges = []
     self.vocab_size = vocab_size
     self.verbose = verbose
@@ -291,7 +292,8 @@ class bpe:
 
     CONTINUE_PRETRAINED = len(self.merges) != 0
 
-    t = self.preprocess(t)
+    if self.do_preprocess:
+      t = self.preprocess(t)
 
     if self.seg:
       print("apply pre segmentation ...")
