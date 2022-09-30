@@ -5,8 +5,8 @@ import morfessor
 import random 
 from farasa.segmenter import FarasaSegmenter
 import pickle 
-from tqdm.notebook import tqdm
-from .const import SOW, UNK, PAD, MORPH_SEP, SEG_SEP, SOS, EOS
+from tqdm import tqdm
+from .const import SOW, UNK, PAD, MORPH_SEP, SOS, EOS
 import os 
 
 class bpe:
@@ -14,7 +14,7 @@ class bpe:
   Tokenizer main class
   """
   def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = False, prob = 0,
-               lang = 'ar', do_preprocess = True, lower_case = True, prefixes = [], suffixes = []):
+               lang = 'ar', do_preprocess = True, lower_case = False, prefixes = [], suffixes = []):
     self.special_tokens = [PAD, UNK, SOW, SOS, EOS]
     self.vocab = [PAD, UNK, SOW, SOS, EOS]
     self.sow = SOW
@@ -55,8 +55,8 @@ class bpe:
       self.name += '-seg'
       self.segmenter = FarasaSegmenter()
 
-    self.name += f'-{lang}'
-    self.name += f'-{vocab_size}'
+    # self.name += f'-{lang}'
+    # self.name += f'-{vocab_size}'
     self.lower_case = lower_case
     nltk.download('punkt', quiet=True) 
 

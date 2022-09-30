@@ -1,6 +1,6 @@
 import time 
 from .const import RESERVERD_WORDS, UNK 
-from tqdm.notebook import tqdm
+from tqdm import tqdm
 
 class Evaluate:
     def __init__(self, corpus, gold_tokens, tokenizer):
