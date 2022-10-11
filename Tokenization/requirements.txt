@@ -2,3 +2,4 @@ farasapy
 tqdm
 nltk
 Morfessor
+conllu
