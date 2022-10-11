@@ -51,7 +51,7 @@ class Evaluate:
                     sum(len(word) + 1 for word in words)
                 )
                 return normalized_factor
-            return factor
+            return 1-factor
 
     def evaluate_on_inf_speed(self):
         start_time = time.time()

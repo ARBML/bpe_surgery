@@ -41,10 +41,10 @@ class bpe:
     self.prefixes = prefixes 
     self.suffixes = suffixes
     self.affixes = []
-    self.name = 'bpe'
+    self.name = 'BPE'
 
     if self.morph:
-      self.name += '-morph'
+      self.name = 'MaT-'+self.name
       if lang == 'en':
         io = morfessor.MorfessorIO()
         self.segmenter = io.read_binary_model_file('morfessor.bin')
@@ -52,7 +52,7 @@ class bpe:
         self.segmenter = FarasaSegmenter()
 
     if self.seg:
-      self.name += '-seg'
+      self.name = 'Seg-'+self.name
       self.segmenter = FarasaSegmenter()
 
     # self.name += f'-{lang}'
@@ -297,7 +297,7 @@ class bpe:
 
     if self.seg:
       print("apply pre segmentation ...")
-      t = self.segmenter.segment(t)
+      t = self.segmenter.segment(t).replace("+", " +")
 
     self.corpus = Counter()
     for word in t.split(' '):
@@ -427,7 +427,7 @@ class bpe:
 
     output = []
     if self.seg:
-      sentences = self.segmenter.segment(sentences)
+      sentences = self.segmenter.segment(sentences).replace("+", " +")
 
     pbar = tqdm(total=len(sentences)) 
     for stmt in sentences:
@@ -448,7 +448,7 @@ class bpe:
     if self.seg:
       
       joined_sentences = ' #sep# '.join(sentences)
-      seg_joined_setnences = self.segmenter.segment(joined_sentences)
+      seg_joined_setnences = self.segmenter.segment(joined_sentences).replace("+", " +")
       assert len(sentences) == len(seg_joined_setnences.split('#sep#'))
       sentences = [sentence.strip() for sentence in seg_joined_setnences.split('#sep#')]
 
@@ -503,8 +503,11 @@ class bpe:
 
     if self.seg:
       sentence = self.segmenter.segment(sentence)
-      
-    words = sentence.split(' ')
+      words = sentence.split(' ')
+      words = [word.replace("+", " +") for word in words]
+
+    else:  
+      words = sentence.split(' ')
     pbar = tqdm(total=len(words))
     
     for word in words:

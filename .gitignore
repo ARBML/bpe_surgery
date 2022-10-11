@@ -1,7 +1,7 @@
 *.pyc
 *.Identifier
 Tokenization/datasets/*
-Tokenization/ckpts
+Tokenization/notebooks/ckpts
 Tokenization/.ipynb_checkpoints/
 Tokenization/ckpts/*
 Tokenization/bpe_surgery.egg-info/dependency_links.txt
