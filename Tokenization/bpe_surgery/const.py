@@ -5,4 +5,5 @@ PAD = '<pad>'   # PADDING
 SEG_SEP = "<seg>"
 SOS = '<s>'
 EOS = '</s>'
+SEN_SEP = '<sep>'
 RESERVERD_WORDS = [PAD, UNK, SOS, EOS] 

@@ -6,7 +6,7 @@ import random
 from farasa.segmenter import FarasaSegmenter
 import pickle 
 from tqdm import tqdm
-from .const import SOW, UNK, PAD, MORPH_SEP, SOS, EOS
+from .const import SEN_SEP, SOW, UNK, PAD, MORPH_SEP, SOS, EOS
 import os 
 
 class bpe:
@@ -15,19 +15,21 @@ class bpe:
   """
   def __init__(self, vocab_size = 100, verbose = False, morph = False, morph_with_sep = False, seg = False, prob = 0,
                lang = 'ar', do_preprocess = True, lower_case = False, prefixes = [], suffixes = []):
-    self.special_tokens = [PAD, UNK, SOW, SOS, EOS]
-    self.vocab = [PAD, UNK, SOW, SOS, EOS]
+    self.special_tokens = [PAD, UNK, SOW, SOS, EOS, SEN_SEP]
+    self.vocab = [PAD, UNK, SOW, SOS, EOS, SEN_SEP]
     self.sow = SOW
     self.sos = SOS
     self.eos = EOS
     self.pad = PAD
     self.unk = UNK
+    self.SEN_SEP = SEN_SEP
     
     self.pad_idx = 0
     self.unk_idx = 1
     self.sow_idx = 2
     self.sos_idx = 3
     self.eos_idx = 4
+    self.sen_sep_idx = 5 
 
     self.morph = morph
     self.prob = prob
@@ -388,16 +390,22 @@ class bpe:
     tokens = self._tokenize_word(word, remove_sow=remove_sow)
     return [self.vocab.index(token) for token in tokens]
 
-  def _encode_sentence(self, sentence, add_boundry = False, out_length = None):
+  def _encode_sentence(self, sentence1, sentence2 = None, add_boundry = False, out_length = None):
     """
     encode a senteces
     returns: [list of int]
     """
     output = []
 
-    for word in sentence.split(' '):
+    for word in sentence1.split(' '):
       if len(word) > 0:
         output.append(self._encode_word(word))
+    
+    if sentence2 is not None:
+      output.append([self.sen_sep_idx])
+      for word in sentence2.split(' '):
+        if len(word) > 0:
+          output.append(self._encode_word(word))
 
     output = [item for sublist in output for item in sublist]
     
@@ -437,26 +445,38 @@ class bpe:
     
     return output
   
-  def encode_sentences(self, data = None, add_boundry = False, out_length = None):
+  def fast_segmentation(self, sentences):
+    joined_sentences = ' #sep# '.join(sentences)
+    seg_joined_setnences = self.segmenter.segment(joined_sentences).replace("+", " +")
+    assert len(sentences) == len(seg_joined_setnences.split('#sep#'))
+    sentences = [sentence.strip() for sentence in seg_joined_setnences.split('#sep#')]
+    return sentences
+
+  def encode_sentences(self, sentences1, sentences2 = None, add_boundry = False, out_length = None):
     """
     encode a text corpus from raw data our from a file
     returns: [list of int]
     """
-    sentences = data.copy()
 
     output = []
     if self.seg:
+      sentences1 = self.fast_segmentation(sentences1)
+      if sentences2:
+        sentences2 = self.fast_segmentation(sentences2)
       
-      joined_sentences = ' #sep# '.join(sentences)
-      seg_joined_setnences = self.segmenter.segment(joined_sentences).replace("+", " +")
-      assert len(sentences) == len(seg_joined_setnences.split('#sep#'))
-      sentences = [sentence.strip() for sentence in seg_joined_setnences.split('#sep#')]
-
-    pbar = tqdm(total=len(sentences)) 
-    for stmt in sentences:
-      output.append(self._encode_sentence(stmt, add_boundry = add_boundry, out_length = out_length))
-      pbar.update(1)
-    pbar.close()
+    if sentences2 is None:
+      pbar = tqdm(total=len(sentences1)) 
+      for stmt in sentences1:
+        output.append(self._encode_sentence(stmt, add_boundry = add_boundry, out_length = out_length))
+        pbar.update(1)
+      pbar.close()
+    
+    else:
+      pbar = tqdm(total=len(sentences2)) 
+      for stmt1,stmt2 in zip(sentences1,sentences2):
+        output.append(self._encode_sentence(stmt1, stmt2, add_boundry = add_boundry, out_length = out_length))
+        pbar.update(1)
+      pbar.close()
     
     return output
 
