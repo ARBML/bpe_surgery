@@ -509,7 +509,8 @@ class bpe:
                 continue
             stmt += token.replace(self.sow, '')
         
-
+        if self.seg:
+          stmt = stmt.replace(" +", "")
         output.append(stmt.strip())
       
     return output 
